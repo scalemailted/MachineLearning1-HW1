@@ -1,0 +1,8 @@
+Name:    Ted Holmberg
+Project: Homework 1
+
+Homework hosted as Interactive Web Page:
+https://scalemailted.github.io/MachineLearning1-HW1/
+
+All files hosted on Github
+https://github.com/scalemailted/MachineLearning1-HW1
