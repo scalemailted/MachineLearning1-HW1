@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Ted HW1</title>
+	
+	<!--BootStrap CSS-->
+	<link rel="stylesheet"  href="./styles/bootstrap.min.css"></link>
+	<!--[End] BootStrap CSS-->
+
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp;skin=sunburst"></script>
+
+	<script src="scripts/plotly-latest.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
+	
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+		  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+		});
+	</script>
+	
+	<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async> </script>
+
+
+</head>
+<body >
+	<div class="jumbotron jumbotron-fluid bg-primary">
+		<div class="container">
+			<div class="row text-center">	
+				<div class="col-3-md">		
+					<img src="images/Ted2018.png" height='120'style='border-radius: 50%;'/>
+				</div>
+				<div class="col-9-md">
+					<h1 class="display-3 text-white">Ted Talks:</h1>
+					<h2 class="lead text-white pl-2 ml-2">On Machine Learning</h2>
+				</div>
+			</div>
+			
+			<!--<h1>Ted Talks: <i>on Machine Learning</i></h1>-->
+			<div class="text-center text-white">
+				<div class="bg-white">
+					<hr>
+				</div>
+				<h2>Linear Optimization Techniques:</br><span class="display-4">Conjugant Gradient</span></h2>
+			</div>
+		</div>
+	</div>
+
+<!--#TODO REMOVE QUESTION AND REPLACE WITH EXPLANATION -->
+<!-- BEGIN QUESTION [Part A] -->
+<!--
+	<div class='container text-center p-2'>
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseQues-PartA" aria-expanded="false" aria-controls="collapseQues-PartA">
+			Question [Part A]	
+		</button>
+	</div>
+
+	<div class="container collapse" id="collapseQues-PartA">
+		<b>Algorithm:</b> <i><u>Conjugate Gradient Algorithm</u></i> </br>
+		<div>
+			<b>BEGIN</b></br></br>
+			<b>STEP</b> 1: Set $i := 0$; select the initial point $P_0$.</br></br>
+			<b>STEP</b> 2: If $\nabla f(P_0) = 0$, <b>STOP</b>; else set $d_0 = -\nabla f(P_0)$</br></br>
+			<b>STEP</b> 3: Compute: $\alpha_i = -{\nabla f(P_i)^T d_i \over d_i^T Qd_i}$</br></br>
+			<b>STEP</b> 4: Compute: $P_{i+1} = P_i + \alpha_i d_i$</br></br>
+			<b>STEP</b> 5: Compute: $\nabla f(P_{i+1})$. If $\nabla f(P_{i+1}) = 0$,  <b>STOP</b>.</br></br>
+			<b>STEP</b> 6: Compute: $\gamma_i = {\nabla f(P_{i+1})^T Qd_i \over d_i^TQd_i}$</br></br>
+			<b>STEP</b> 7: Compute: $d_{i+1} = -\nabla f(P_{i+1})+\gamma_i d_i$</br></br>
+			<b>STEP</b> 8: Set $i = i+1$; go to STEP 3.</br></br>
+			<b>END</b>
+		</div>
+	</div>
+-->
+
+	<div class='container'>
+		<h3><b>Part (A) <span class='lead'>[points: 70]</span></b></h3>   
+		
+		<p>
+			Rewrite the <i>CG</i> for minimizing MSE (mean square error) in terms of $\beta$ 
+			<span class='text-muted'><i>(recall lecture_chapter #1, pages: from 8 to 15)</i></span> where, 
+		</p>
+		<p class='text-center'>
+			$Y=X^T\beta$ 
+		</p>
+		<p class='text-center'>
+			 $\text{MSE} = {1 \over N} RSS(\beta)={1 \over N}\sum\limits_{i=1}^N\Big(y_i - x_i^T\beta\Big)^2$ 
+		</p>
+		<p>
+			Replace, $\nabla f_i, P_i, d_i, and \space Q$ from the CG algorithm with $y_i,x_i,\beta_j,X,Y,\beta$ etc. as needed. Show your derivation(s) <i>(if any).</i>
+		</p>
+		<p>
+			<u>Hints:</u> $P_0$ should be replaced by $\beta(0)$ and study carefully to replace $Q$.
+		</p>
+		
+	</div>
+
+<!-- END QUESTION-->
+
+
+	<div class='container text-center p-2'>
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseCGAlgorithm" aria-expanded="false" aria-controls="collapseCGAlgorithm">
+			Conjugate Gradient Algorithm	
+		</button>
+	</div>
+
+	<div class="collapse" id="collapseCGAlgorithm">
+		<div class="container-fluid">
+			<!--<h4 class="lead"><b>BEGIN:</b></h4>-->
+			<h4 class="btn btn-success btn-block text-white rounded disabled">Begin</h4>
+		</div>
+
+		<!-- Step 1-->
+		<div class='container table-secondary rounded'>
+			<div>
+				<div class="pt-2 pb-2"><!-- class="btn btn-sm btn-dark text-white rounded">-->
+					<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 1</span>
+				</div> 
+				Set $t := 0$; select the initial set of coefficients $\beta(0)$ to evaluate.
+				Such that
+				<div> 
+				$
+					\beta(0) = 
+					\begin{bmatrix} 
+						\beta_0(0) \\
+						\beta_1(0) \\
+						\beta_2(0) \\
+						\vdots     \\
+						\beta_p(0)
+					\end{bmatrix} 
+				$
+				</div>
+				<div class='pt-1 mt-1'>
+					We denote the initial guess for $\beta_*$ by $\beta(0)$ 
+					(we can assume without loss of generality that $\beta(0) = 0$). 
+					Where $t$ represents the number of iterations that this algorithm runs.
+				Conjugant gradient shouldn't run more than the number of $\beta$ terms exists.
+				</div>
+			</div>
+			
+		</div>
+
+
+		<!-- Step 2 -->
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+
+				<div>
+					<div class="pb-2"><!-- class="btn btn-sm btn-dark text-white rounded">-->
+						<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 2</span>
+					</div> 
+
+					<div>
+						If $\nabla f\big(\beta(0)\big) = 0$, <b>STOP</b>; else set $d_0 = -\nabla f\big(\beta(0)\big)$
+						</br> 
+						Since 
+						$ f\big(\beta(t)\big) \Rightarrow RSS(\beta(t))={1 \over N}\sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)^2$
+					</div>
+					
+					<div class='text-right'>
+						<button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseStep2Work" aria-expanded="false" aria-controls="collapseStep2Work">
+	   						Show Work	
+	  					</button>
+	  				</div>
+
+					<div class="collapse" id="collapseStep2Work">
+						<div class="card card-body pt-2 mt-2">
+							<b>show work:</b>
+
+							<div>
+								${\partial \over \partial \beta(t)_j} RSS\big(\beta(t)\big) = {\partial \over \partial \beta(t)_j} {1 \over N}\sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)^2$
+							</div>
+							<div>
+								Apply the power rule then chain rule</br>
+								$= {2 \over N}\sum\limits_{i=1}^N \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot {\partial \over \partial \beta(t)_j} \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)$
+							</div>
+							<div>
+								Expand the summation term into a linear equation and take the derivative in terms of $\beta_j(t)$
+								$= {2 \over N}\sum\limits_{i=1}^N \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot {\partial \over \partial \beta(t)_j} \Big(\text{y}(i) - \text{x}(i)_0\beta(t)_0 - \text{x}(i)_1\beta(t)_1 - \dots - \text{x}(i)_j\beta(t)_j - \dots \Big)$
+							</div>
+							<div>
+								Since only one $\beta_j(t)$ term exists in the sequence, only the $\text{x}(i)_j$ remains from applying the chain rule</br>
+								$= {2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j$
+							</div>
+						</div>
+					</div>
+
+					Then 
+						$
+							\nabla f\big( \beta(t) \big) 
+							= {\partial \over {\partial \beta_j(t)} }f\big(\beta(t)\big)
+							= {2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j
+						$
+				</div>
+
+				<div class='text-right'>
+					<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep2Work2" aria-expanded="false" aria-controls="collapseStep2Work2">
+						Show Work	
+					</button>
+	  			</div>
+
+	  			<div class="collapse" id="collapseStep2Work2">
+					<div class="card card-body pt-2 mt-2">
+						<!-- #WORK-->
+						<div>#Try: Expanded form distance step $d_0$</div>
+						<div>
+							$d_0 = -\nabla f\big( \beta_j(t) \big) = -{2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j$
+						</div> 
+						<div>
+							$= {2 \over N} \sum\limits_{i=1}^N\Big( \text{x}(i)^T\beta(t) - \text{y}(i) \Big) \cdot \text{x}(i)_j$
+						</div>
+						<div>
+							$= {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j$
+						</div>
+				
+
+					</div>
+				</div>
+		</div>
+
+		<!-- Step 3 -->
+
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 3</span>
+			</div> 
+
+			<div>
+				Compute: $\alpha_t = -{\nabla f\big(\beta(t)\big)^T d_t \over d_t^T Qd_t}$
+			</div>
+
+			<div class='text-right'>
+					<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep3Work" aria-expanded="false" aria-controls="collapseStep3Work">
+						Show Work	
+					</button>
+	  		</div>
+				
+			<div class="collapse" id="collapseStep3Work">
+				<div class="card card-body pt-2 mt-2">
+					<b>show work:</b>
+					<div>$RSS\big(\beta \big) = {1 \over N} (\textbf{y} - \textbf{X}\beta)^T (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>$= {1 \over N}  \big[\textbf{y}^T - (\textbf{X}\beta)^T \big] (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>$= {1 \over N}  (\textbf{y}^T - \beta^T\textbf{X}^T ) (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>
+						$=    {1 \over N} \textbf{y}^T \textbf{y} 
+							- {1 \over N} \beta^T \textbf{X}^T \textbf{y} 
+							- {1 \over N} \textbf{y}^T \textbf{X} \beta  
+							+ {1 \over N} \beta^T \textbf{X}^T \textbf{X} \beta 
+						$
+					</div>
+					<div>$= 
+							  {1 \over N}  \textbf{y}^T \textbf{y} 
+							- {1 \over N}  \beta^T \textbf{X}^T \textbf{y} 
+							- {1 \over N}  \beta^T \textbf{X}^T \textbf{y}  
+							+ {1 \over N}  \beta^T \textbf{X}^T \textbf{X} \beta $
+					</div>
+					<div>$= 
+							  {1 \over N} \textbf{y}^T \textbf{y} 
+							- {1 \over N} 2\beta^T \textbf{X}^T \textbf{y} 
+							+ {1 \over N} \beta^T \textbf{X}^T \textbf{X} \beta 
+							$
+					</div>
+					<p>
+						w.r.t. $\beta$, we can reorder terms as:
+					</p>
+					<p>
+						$
+							  {1 \over N} \beta^T \textbf{X}^T \textbf{X} \beta 
+							- {1 \over N} 2\textbf{y}^T \textbf{X} \beta  
+							+ {1 \over N} \textbf{y}^T \textbf{y}
+						$
+					</p>
+					<p>
+						Notice that this equation is in quadratic form of: $ax^2 + bx + c$, where $\beta$ is the $x$ term.Its important that this equation is expressed in quadratic terms
+						because then it guarantees that a minimum exists.
+					</p> 
+					<p>
+						The quadratic form of matrix equation should be in form:
+					</p>
+					<p>
+						$f(X) = {1 \over 2} X^TQX - b^TX$, 
+					</p>
+					<p>
+						Note that a $c$ term may or may not exist, 
+						it doesn't matter since it disappears as a constant term 
+						when taking the derivative with regard to $\beta$. 
+						In terms of this problem, let's restate the 
+						quadratic for in terms of $\beta$ as:
+						$f(\beta) = {1 \over 2} \beta^TQ\beta - b^T\beta$. 
+					</p>
+					<p>
+						$f(\beta) = {1 \over 2} \beta^TQ\beta - b^T\beta + c$ 
+						$\Rightarrow$
+						$f(\beta) = {1 \over N} \beta^T \textbf{X}^T \textbf{X} \beta - {2 \over N}  \textbf{y}^T \textbf{X} \beta  + {1 \over N} \textbf{y}^T \textbf{y}$
+
+					</p>
+					<p>
+						To calculate $Q$ 
+					</p>
+					<p>
+						${1 \over 2} \beta^TQ\beta = {1 \over N} \beta^T \textbf{X}^T \textbf{X} \beta$
+					</p>
+					<p>
+						<!--#TODO: SHOW STEPS TO GET TO BELOW!</br>-->
+						${1 \over 2} Q= {1 \over N} \textbf{X}^T \textbf{X}$ </br>
+					</p>
+					<p>
+						$Q = {2 \over N} \textbf{X}^T \textbf{X}$
+					</p>
+				</div>
+			</div>
+
+			<p>
+				Given Quadratic Matrix form: 
+				$\nabla(\beta) = \beta^T Q \beta - \beta^T b + c$
+			</p>
+			<p>
+				Where $Q = {2 \over N} \textbf{X}^T \textbf{X}$, $b={2 \over N} \textbf{y}^T \textbf{X}$, and $c={1 \over N}\textbf{y}^T \textbf{y}$
+			</p>
+			
+			<div class='text-right'>
+				<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep3Work2" aria-expanded="false" aria-controls="collapseStep3Work2">
+					Show Work	
+				</button>
+	  		</div>
+
+	  		<div class="collapse" id="collapseStep3Work2">
+				<div class="card card-body pt-2 mt-2">
+					<p>Expanded form of $\alpha_0$ using $d_0$</p>
+					<p>
+						$\alpha_0 = -{\nabla f\big(\beta(0)\big)^T d_0 \over d_0^T Qd_0}$ 
+
+						$={
+								 -\Big[ {2 \over N}\Big( \textbf{y} - \textbf{X}^T\beta(t)\Big) \cdot \textbf{x}_j \Big]^T  \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( {2 \over N} \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$ 
+					
+					
+					<p>
+						Distribute the negative sign into $\nabla f\big(B(0)\big)$ term, converting it into the same as $d_0$.
+					</p>
+					<p>
+						$={
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( {2 \over N} \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$
+					</p>
+					
+					<!-- Pull scalar terms out-->
+					<div>
+						<p>
+							Cancel like scalar terms in division, and pull remaining terms to front of equation.
+						</p>
+						<p>
+							$\require{enclose}
+							={
+									 \Big[ \enclose{verticalstrike}{{2 \over N}} \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  
+									 \Big[ \enclose{verticalstrike}{{2 \over N}} \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+									\over 
+									\Big[ \enclose{verticalstrike}{{2 \over N}} \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( {2 \over N} \textbf{X}^T \textbf{X} \Big) \Big[ \enclose{verticalstrike}{{2 \over N}} \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+							}$
+						</p>
+
+						<p>
+							$
+							={N \over 2}
+							{	
+									 \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  
+									 \Big[  \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+									\over 
+									\Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( \textbf{X}^T \textbf{X} \Big) \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+							}$
+						</p>
+					</div>
+
+
+<!--
+					<div>
+						Cancel like terms in the numerator and denominator.</br>
+						#TODO: 	cannot do division on matrices, convert to sigma summations to cancel</br>
+						$\require{enclose}
+						={
+								\enclose{horizontalstrike}{ \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T}  \enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]} 
+								\over 
+								\enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T} \Big( 2 \textbf{X}^T \textbf{X} \Big) \enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]}
+						}$
+					</div>
+					<div>
+						Remove canceled terms to get:</br>
+						$={
+								1 
+								\over 
+								\big( 2 \textbf{X}^T \textbf{X} \big) 
+						}$
+					</div>
+					<div>
+						Final result of $\alpha_0$ in terms of machine learning data labeling: $X,Y,\beta$</br>
+						$={
+								{1\over2} \big( \textbf{X}^T \textbf{X}\big)^{-1}
+						}$
+					</div>
+-->
+
+				</div>
+
+			</div>		
+		</div>
+
+		<!-- Step 4 -->
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 4</span>
+			</div> 
+
+			<div> 
+				Compute: $\beta_j(t+1) = \beta_j(t) + \alpha_t d_t$
+			</div>
+
+			<div class='text-right'>
+				<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep4Work" aria-expanded="false" aria-controls="collapseStep4Work">
+					Show Work	
+				</button>
+	  		</div>
+
+	  		<div class="collapse" id="collapseStep4Work">
+				<div class="card card-body pt-2 mt-2">
+					<p>Expanded form of $\beta_j(0+1)$ using $\beta(0)$, $\alpha_0$ and $d_0$<p>
+
+					<div>
+						$
+							\beta_j(1) = \beta_j(0) + 
+							{N\over2}
+							{	
+									 \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  
+									 \Big[  \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+									\over 
+									\Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( \textbf{X}^T \textbf{X} \Big) \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+							}
+							\cdot 
+							{2 \over N}\Big( \textbf{X}^T\beta(0) - \textbf{y} \Big) \cdot \textbf{x}_j
+						$
+					</div>
+
+					<div>
+						<p>Cnacel scalar values</p>
+						<p>
+							$
+								\beta_j(1) = \beta_j(0) + 
+								
+									{	
+										 \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  
+										 \Big[  \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+										\over 
+										\Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( \textbf{X}^T \textbf{X} \Big) \Big[ \Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+									}
+									\cdot 
+									\big( \textbf{X}^T\beta(0) - \textbf{y} \big) \cdot \textbf{x}_j
+								
+							$
+						</p>
+					</div>
+<!-- 
+					<div>
+						$
+							\beta_j(1) = \beta_j(0) + 
+							{1\over2} \big( \textbf{X}^T \textbf{X}\big)^{-1}
+							\cdot 
+							{2 \over N}\Big( \textbf{X}^T\beta(0) - \textbf{y} \Big) \cdot \textbf{x}_j
+						$
+					</div>
+
+
+
+					<div>
+						<p>Combine scalar values</p>
+						<p>
+							$
+								\beta_j(1) = \beta_j(0) + 
+								{1 \over N}
+								\Big[
+									\big( \textbf{X}^T \textbf{X}\big)^{-1}
+									\cdot 
+									\big( \textbf{X}^T\beta(0) - \textbf{y} \big) \cdot \textbf{x}_j
+								\Big]
+							$
+						</p>
+					</div>
+-->
+
+				</div>
+			</div>
+		</div>
+
+		<!-- Step 5-->
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 5</span>
+			</div> 
+
+			<div>
+				Compute: $\nabla f\big(\beta_j(t+1)\big)$. If $\nabla f\big(\beta_j(t+1)\big) = 0$,  <b>STOP</b>.
+			</div>
+
+			<div class='text-right'>
+				<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep5Work" aria-expanded="false" aria-controls="collapseStep5Work">
+					Show Work	
+				</button>
+	  		</div>
+
+	  		<div class="collapse" id="collapseStep5Work">
+				<div class="card card-body pt-2 mt-2">
+					expanded form given $\beta(t+1)$:</br>
+					$\nabla f\big(\beta_j(t+1)\big) = {2 \over N}\Big( \textbf{X}^T\beta(t+1) - \textbf{y} \Big) \cdot \textbf{x}_j$
+				</div>
+			</div>
+			
+		</div>
+
+		<!-- Step 6-->
+
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 6</span>
+			</div> 
+
+			<div>
+				Compute: $\gamma_t = {\nabla f\big(\beta_j(t+1)\big)^T Qd_t \over d_t^TQd_t}$
+			</div>
+
+			<div class='text-right'>
+				<button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#collapseStep6Work" aria-expanded="false" aria-controls="collapseStep6Work">
+					Show Work	
+				</button>
+	  		</div>
+
+	  		<div class="collapse" id="collapseStep6Work">
+				<div class="card card-body pt-2 mt-2">
+					<p>
+						expanded form of this step for $\gamma_0$ using $d_0$ in terms of $X$, $Y$, $\beta$:
+					</p>
+					<p>
+						$\gamma_0 = {\nabla f\big(\beta(0)\big)^T Q d_0 \over d_0^T Qd_0}$ 
+
+						$={
+								 \Big[ {2 \over N}\Big( \textbf{y} - \textbf{X}^T\beta(t)\Big) \cdot \textbf{x}_j \Big]^T \Big( {2 \over N} \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( {2 \over N} \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$ 
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Step 7 -->
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 7</span>
+			</div> 
+
+			<p>
+				Compute: $d_{t+1} = -\nabla f\big(\beta(t+1)\big)+\gamma_t d_t$
+			</p>
+		</div>
+
+		<!-- Step 8-->
+		<div class='container table-secondary rounded pt-2 mt-2 pb-2 mb-2'>
+			<div class="pb-2">
+				<span class='bg-dark text-white rounded pl-1 pr-1 pt-1 pb-1'>Step 8</span>
+			</div> 
+			<p>
+				Set $t = t+1$; go to STEP 3.
+			</p>
+		</div>
+
+		<div class="container-fluid">
+			<!--<h4 class="lead"><b>BEGIN:</b></h4>-->
+			<h4 class="btn btn-danger text-white  btn-block rounded disabled">End</h4>
+		</div>
+	</div>
+
+<!--#TODO [REMOVE] QUESTION PART B-->
+<div class='container'>
+	<hr>
+	<h3><b>Part (B) <span class='lead'>[points: 30]</span></b></h3> 
+</div>  
+<!-- -->
+
+
+	<!-- CG 3D Surface Plots-->
+	<div class='d-flex justify-content-center table-secondary container-fluid p-2'>
+			<div class='border border-secondary' id='3d-plot'></div>
+			<div id='contour-plot'></div>
+	</div>
+
+
+	<!-- CG Source Code -->
+	<div class='container text-center p-2'>
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseCGJS" aria-expanded="false" aria-controls="collapseCGJS">
+			Conjugate Gradient in JavaScript	
+		</button>
+	</div>
+
+<div class="collapse" id="collapseCGJS">
+<div class='container'>
+<pre class="prettyprint">
+/*Conjugate Gradient*/
+//x (inital guess), A, b (quadratic form) are all NumJS array types
+function conjugateGradient(x,A,b){
+    let steps = []                              //list to store iterative values
+    let i = 0                                   //iterator counter
+    let r = nj.subtract(b, nj.dot(A,x) )        //r = b - A * x
+    let d = r                                   //distance = r
+    let deltanew = nj.dot(r.T,r)                //deltanew = r.T * r
+    let delta0 = deltanew.get(0)                //delta0 = deltanew
+    while (i < x.length ){
+        let dAd = nj.dot( d.T, nj.dot(A,d) );   //let rAr =  nj.dot(r.T, nj.dot(A,r) );
+        alpha = deltanew.get(0) / dAd.get(0);   //let alpha = delta.get(0) / rAr.get(0) ;
+        x = nj.add(x, nj.multiply(d, alpha));   //x = nj.add(x, nj.multiply(r,alpha))
+        steps.push( [x.get(0), x.get(1)] )      //# store steps for future drawing
+        r = nj.subtract(b, nj.dot(A,x) );       //r = b - A * x
+        deltaold = deltanew
+        deltanew = nj.dot(r.T,r)                //delta = nj.dot(r.T,r)
+        beta = deltanew.get(0) / deltaold.get(0)
+        d = nj.add(r, nj.multiply(d, beta))
+        i += 1
+    }
+    return steps
+}
+</pre>
+</div>
+</div>
+
+
+
+
+	<!-- DONE-->
+
+<!--
+		<div>
+		<b>Converted Algorithm:</b> <i>Conjugate Gradient</i> </br>
+		<div>
+			<p>
+				<b>BEGIN</b>
+			</p>
+			<div>
+				<b>STEP</b> 1: 
+				Set $t := 0$; select the initial set of coefficients $\beta(0)$ to evaluate.
+				Such that 
+				$
+					\beta(0) = 
+					\begin{bmatrix} 
+						\beta_0(0) \\
+						\beta_1(0) \\
+						\beta_2(0) \\
+						\vdots     \\
+						\beta_p(0)
+					\end{bmatrix} 
+				$
+
+			</br></br>
+			We denote the initial guess for $\beta_*$ by $\beta(0)$ 
+			(we can assume without loss of generality that $\beta(0) = 0$). 
+			</br> Where $t$ represents the number of iterations that this algorithm runs.
+			Conjugant gradient shouldn't run more than the number of $\beta$ terms exists.
+			</div>
+
+			<p>
+				<b>STEP</b> 2: 
+				If $\nabla f\big(\beta(0)\big) = 0$, <b>STOP</b>; else set $d_0 = -\nabla f\big(\beta(0)\big)$
+				</br> Since 
+					$ f\big(\beta(t)\big) \Rightarrow RSS(\beta(t))={1 \over N}\sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)^2$
+				
+				<div style='color:rgb(200,0,0);'>
+					<b>show work:</b>
+					<div>
+						${\partial \over \partial \beta(t)_j} RSS\big(\beta(t)\big) = {\partial \over \partial \beta(t)_j} {1 \over N}\sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)^2$
+					</div>
+					<div>
+						Apply the power rule then chain rule</br>
+						$= {2 \over N}\sum\limits_{i=1}^N \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot {\partial \over \partial \beta(t)_j} \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big)$
+					</div>
+					<div>
+						Expand the summation term into a linear equation and take the derivative in terms of $\beta_j(t)$
+						$= {2 \over N}\sum\limits_{i=1}^N \Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot {\partial \over \partial \beta(t)_j} \Big(\text{y}(i) - \text{x}(i)_0\beta(t)_0 - \text{x}(i)_1\beta(t)_1 - \dots - \text{x}(i)_j\beta(t)_j - \dots \Big)$
+					</div>
+					<div>
+						Since only one $\beta_j(t)$ term exists in the sequence, only the $\text{x}(i)_j$ remains from applying the chain rule</br>
+						$= {2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j$
+					</div>
+				</div>
+
+				</br> Then 
+					$
+						\nabla f\big( \beta(t) \big) 
+						= {\partial \over {\partial \beta_j(t)} }f\big(\beta(t)\big)
+						= {2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j
+					$
+			</p>
+				<div style='color:rgb(200,0,0);'>
+					#Try: Expanded form distance step $d_0$
+					<div>
+						$d_0 = -\nabla f\big( \beta_j(t) \big) = -{2 \over N} \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta(t)\Big) \cdot \text{x}(i)_j$
+					</div> 
+					<div>
+						$= {2 \over N} \sum\limits_{i=1}^N\Big( \text{x}(i)^T\beta(t) - \text{y}(i) \Big) \cdot \text{x}(i)_j$
+					</div>
+					<div>
+						$= {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j$
+					</div>
+				</div>
+			<p>
+				<b>STEP</b> 3: 
+				Compute: $\alpha_t = -{\nabla f\big(\beta(t)\big)^T d_t \over d_t^T Qd_t}$
+				
+				<div style='color:rgb(200,0,0);'>
+					<b>show work:</b>
+					<div>$RSS\big(\beta \big) = (\textbf{y} - \textbf{X}\beta)^T (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>$= \big[\textbf{y}^T - (\textbf{X}\beta)^T \big] (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>$= (\textbf{y}^T - \beta^T\textbf{X}^T ) (\textbf{y} - \textbf{X}\beta)$</div>
+					<div>$= \textbf{y}^T \textbf{y} - \beta^T \textbf{X}^T \textbf{y} -\textbf{y}^T \textbf{X} \beta  + \beta^T \textbf{X}^T \textbf{X} \beta $</div>
+					<div>$= \textbf{y}^T \textbf{y} - \beta^T \textbf{X}^T \textbf{y} - \beta^T \textbf{X}^T \textbf{y}  + \beta^T \textbf{X}^T \textbf{X} \beta $</div>
+					<div>$= \textbf{y}^T \textbf{y} - 2\beta^T \textbf{X}^T \textbf{y} + \beta^T \textbf{X}^T \textbf{X} \beta $</div>
+					<div>
+						w.r.t. $\beta$, we can reorder terms as:
+						$\beta^T \textbf{X}^T \textbf{X} \beta - 2\textbf{y}^T \textbf{X} \beta  + \textbf{y}^T \textbf{y}$
+					</div>
+					<div>
+						Notice that this equation is in quadratic form of:
+						$ax^2 + bx + c$, where $\beta$ is the $x$ term.
+						Its important that this equation is expressed in quadratic terms
+						because then it guarantees that a minimum exists. 
+						The quadratic form of matrix equation should be in form:
+						$f(X) = {1 \over 2} X^TQX - b^TX$, 
+						note that a $c$ term may or may not exist, 
+						it doesn't matter since it disappears as a constant term 
+						when taking the derivative. In terms of this problem, let's restate the 
+						quadratic for in terms of $\beta$ as $f(\beta) = {1 \over 2} \beta^TQ\beta - b^T\beta$. 
+					</div>
+					<div>
+						$f(\beta) = {1 \over 2} \beta^TQ\beta - b^T\beta + c$ 
+						$\Rightarrow$
+						$f(\beta) = \beta^T \textbf{X}^T \textbf{X} \beta - 2\textbf{y}^T \textbf{X} \beta  + \textbf{y}^T \textbf{y}$
+
+					</div>
+					<div>
+						To calculate $Q$ </br>
+						${1 \over 2} \beta^TQ\beta = \beta^T \textbf{X}^T \textbf{X} \beta$</br>
+						#SHOW STEPS TO GET TO BELOW!</br>
+						${1 \over 2} Q= \textbf{X}^T \textbf{X}$ </br>
+						$Q = 2\textbf{X}^T \textbf{X}$
+
+					</div>
+				</div>
+				<div>Where $Q = 2 \textbf{X}^T \textbf{X}$, $b=2\textbf{y}^T \textbf{X}$, and $c=\textbf{y}^T \textbf{y}$</div>
+			
+				<div style='color:rgb(0,0,180);'>
+					Expanded form of $\alpha_0$ using $d_0$
+					<div>
+						$\alpha_0 = -{\nabla f\big(\beta(0)\big)^T d_0 \over d_0^T Qd_0}$ 
+
+						$={
+								 -\Big[ {2 \over N}\Big( \textbf{y} - \textbf{X}^T\beta(t)\Big) \cdot \textbf{x}_j \Big]^T  \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( 2 \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$ 
+					</div>
+					<div>
+						distribute the negative sign into $\nabla f\big(B(0)\big)$ term, converting it into the same as $d_0$.</br>
+						$={
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T  \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( 2 \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$
+					</div>
+					<div>
+						Cancel like terms in the numerator and denominator.</br>
+						#TODO: 	cannot do division on matrices, convert to sigma summations to cancel</br>
+						$\require{enclose}
+						={
+								\enclose{horizontalstrike}{ \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T}  \enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]} 
+								\over 
+								\enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T} \Big( 2 \textbf{X}^T \textbf{X} \Big) \enclose{horizontalstrike}{\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]}
+						}$
+					</div>
+					<div>
+						Remove canceled terms to get:</br>
+						$={
+								1 
+								\over 
+								\big( 2 \textbf{X}^T \textbf{X} \big) 
+						}$
+					</div>
+					<div>
+						Final result of $\alpha_0$ in terms of machine learning data labeling: $X,Y,\beta$</br>
+						$={
+								{1\over2} \big( \textbf{X}^T \textbf{X}\big)^{-1}
+						}$
+					</div>
+
+				</div>
+
+			</p>
+			<div>
+				<b>STEP</b> 4: 
+				Compute: $\beta_j(t+1) = \beta_j(t) + \alpha_t d_t$
+
+				<div style='color:rgb(0,0,180);'>
+					Expanded form of $\beta_j(0+1)$ using $\beta(0)$, $\alpha_0$ and $d_0$
+					<div>
+						$
+							\beta_j(1) = \beta_j(0) + 
+							{1\over2} \big( \textbf{X}^T \textbf{X}\big)^{-1}
+							\cdot 
+							{2 \over N}\Big( \textbf{X}^T\beta(0) - \textbf{y} \Big) \cdot \textbf{x}_j
+						$
+					</div>
+					<div>
+						Combine scalar values</br>
+						$
+							\beta_j(1) = \beta_j(0) + 
+							{1 \over N}
+							\Big[
+								\big( \textbf{X}^T \textbf{X}\big)^{-1}
+								\cdot 
+								\big( \textbf{X}^T\beta(0) - \textbf{y} \big) \cdot \textbf{x}_j
+							\Big]
+						$
+					</div>
+				</div>
+			</div>
+			<div>
+				<b>STEP</b> 5: 
+				Compute: $\nabla f\big(\beta_j(t+1)\big)$. If $\nabla f\big(\beta_j(t+1)\big) = 0$,  <b>STOP</b>.
+				<div style='color:rgb(0,0,180);'>
+					<div>
+						expanded form given $\beta(t+1)$:</br>
+						$\nabla f\big(\beta_j(t+1)\big) = {2 \over N}\Big( \textbf{X}^T\beta(t+1) - \textbf{y} \Big) \cdot \textbf{x}_j$
+					</div>
+				</div>
+			</div>
+			<div>
+				<b>STEP</b> 6: 
+				Compute: $\gamma_t = {\nabla f\big(\beta_j(t+1)\big)^T Qd_t \over d_t^TQd_t}$
+				<div style='color:rgb(0,0,180);'>
+					expanded form of this step for $\gamma_0$ using $d_0$ in terms of $X$, $Y$, $\beta$:</br>
+					<div>
+						$\gamma_0 = {\nabla f\big(\beta(0)\big)^T Q d_0 \over d_0^T Qd_0}$ 
+
+						$={
+								 \Big[ {2 \over N}\Big( \textbf{y} - \textbf{X}^T\beta(t)\Big) \cdot \textbf{x}_j \Big]^T \Big( 2 \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big] 
+								\over 
+								\Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]^T \Big( 2 \textbf{X}^T \textbf{X} \Big) \Big[ {2 \over N}\Big( \textbf{X}^T\beta(t) - \textbf{y} \Big) \cdot \textbf{x}_j \Big]
+						}$ 
+					</div>
+				</div>
+			</div>
+			<p>
+				<b>STEP</b> 7: 
+				Compute: $d_{t+1} = -\nabla f\big(\beta(t+1)\big)+\gamma_t d_t$
+			</p>
+			<p>
+				<b>STEP</b> 8: 
+				Set $t = t+1$; go to STEP 3.
+			</p>
+			<p>
+				<b>END</b>
+			</p>
+		</div>
+	</div>
+
+-->
+
+<!--
+#TODO - [INTRO] ADD THIS AS INTRO (REMOVE QUESTIONS) AND MAKE LIKE A BLOG POST/LESSON PLAN/TUTORIAL
+<div class='container'>
+
+
+	<hr>
+	<div>
+		<h3>Abstract</h3>
+		<p>
+			In this work, I will discuss the basics of linear modeling and linear regression for the purpose of building predictor functions.
+			Specifically, I will examine the conjugant gradient algorithm for evaluating and optimizing the coefficents in a linear predictor. 
+			This paper is targetted toward novices who have little understanding in machine learning and linear modeling techniques.
+		</p>
+	<div>
+	</div>
+
+		<div>
+		<h3>Background Information on Linear Models</h3>
+		<img src="images/background.jpg" height='500'/>
+		<p>
+			Predictors are mathematical functions that given a set of input values, outputs a prediction. 
+			A concrete example might be attempting to predict the price of a house 
+			given the square footage, number of bathrooms, and number of bedrooms.
+			One approach of expressing this relation might be as a simple equation where:
+		</p>
+
+		<div style="text-align:center"><b>Notional Understanding of Math for a Predictor</b></div>
+		<span>$$House Price = Square Footage + Bathrooms + Bedrooms + Base Price.$$</span> 
+		<p>
+			Notice that such a notional prediction is expressed in the form of a linear equation. 
+			Predictors may be defined in terms of a linear equation taking the slope-intercept form of the equation for a line.
+			When a predictor is defined in terms of a linear equation, we call that approach linear modeling.
+		</p>
+		<div style="text-align:center"><b>Slope-Intecept Form:</b></div>
+		<span>$$y = mx + b$$</span>
+		<div style="text-align:center">
+			<a href='http://zonalandeducation.com/mmts/functionInstitute/linearFunctions/new/lsif0.php'>
+				Image/Graphic of line where you can modify m b
+			</a>
+		</div>
+		<p>
+			In this basic slope-intercept form, 
+			the <i>independent variable</i>, otherwise known in Machine Learning, as the <i>feature</i> is $x$.
+			The <i>coefficient</i> $m$ of the <i>feature</i> $x$ is the <i>slope</i> and affects how much $x$ contributes to the result $y$ 
+        	and $b$ is the intial <i>y-intercept</i>, where the intial starting potion is before any feature $x$ is applied (i.e. $x=0$).
+        	Finally, $y$ is the <i>dependent variable</i>, otherwise known as the <i>prediction</i> in Machine Learning from this linear model.
+        </p>
+        <div style="text-align:center">
+        	<img src="images/Diagram01.jpg" height="300"/>
+        </div>
+        <p>
+			A more generalized form of this equations allows for any number of features to be used in calculating a prediction:</br>
+			</br>
+			<div style="text-align:center"><b>Linear Model (General Form):</b></div>
+			$$ \widehat Y = \widehat \beta_0 $$
+			The above is what we would use in the oringally housing example given earlier to build a predictor.
+		</p>
+	</div>
+
+	<div>
+		Given a linear equation in the form of: $ $ </br>
+
+		<p>
+			Given a quadratic linear equation in the form of 
+			$C_1 x_1^2+C_2 x_2^2+ C_3 x_3^2+x_1 x_2+x_1 x_3+x_2 x_3+x_1+ x_2+x_3$
+		</p>
+		<p>Q for Quadratic form</p>
+
+#TODO [END INTRO]
+-->
+
+<!--
+		<p>
+			$\underset {3 \times 3 } Q = \begin{bmatrix}
+					x_1^2   & x_1 x_2 & x_1 x_3 \\
+					x_1 x_2 & x_2^2   & x_2 x_3 \\ 
+					x_1 x_3 & x_2 x_3 & x_3^2 
+				\end{bmatrix}$
+		</p>
+		<p>
+			$Q = \begin{bmatrix} 
+					a_{11} & a_{12} & \dots \\
+    				\vdots & \ddots &       \\
+    				a_{K1} &        & a_{KK} 
+    			\end{bmatrix}$
+		</p>
+		<p>
+			$\underset {n \times n } Q = \begin{bmatrix} 
+					x_1^2       & x_1 x_2     & \dots  & x_1 x_{n-1}     & x_1 x_n     \\
+					x_1 x_2     & x_2^2       & \dots  & x_2 x_{n-1}     & x_2 x_n     \\
+    				\vdots      & \vdots      & \ddots & \vdots          &  \vdots     \\
+    				x_1 x_{n-1} & x_2 x_{n-1} & \dots  & x_{n-1}^2       & x_{n-1} x_n \\
+    				x_1 x_n     & x_2 x_n     & \dots  & x_{n-1} x_n     & x_n^2       \\
+    			\end{bmatrix} 
+
+    		\beta_{n \times 1} = \begin{bmatrix} 
+    			x_1 \\ x_2 \\ \vdots \\ x_{n-1} \\ x_n
+    		\end{bmatrix}$
+		</p>
+
+		<p>
+			$\[ \frac{\partial u}{\partial t}
+   			= h^2 \left( \frac{\partial^2 u}{\partial x^2}
+      		+ \frac{\partial^2 u}{\partial y^2}
+      		+ \frac{\partial^2 u}{\partial z^2} \right) \]$
+		</p>
+		
+
+		<p>
+			$C_{(x_1^2)}$
+			$C_{(x_1 x_2)}$
+			$C_{(x_{n-1} x_n)}$
+
+		</p>
+	</div>
+-->
+
+<!--
+	<h3>Conjugate Gradient Equation</h3>
+	<div>
+		<b>Algorithm:</b> <i><u>Conjugate Gradient Algorithm</u></i> </br>
+		<div>
+			<b>BEGIN</b></br></br>
+			<b>STEP</b> 1: Set $i := 0$; select the initial point $P_0$.</br></br>
+			<b>STEP</b> 2: If $\nabla f(P_0) = 0$, <b>STOP</b>; else set $d_0 = -\nabla f(P_0)$</br></br>
+			<b>STEP</b> 3: Compute: $\alpha_i = -{\nabla f(P_i)^T d_i \over d_i^T Qd_i}$</br></br>
+			<b>STEP</b> 4: Compute: $P_{i+1} = P_i + \alpha_i d_i$</br></br>
+			<b>STEP</b> 5: Compute: $\nabla f(P_{i+1})$. If $\nabla f(P_{i+1}) = 0$,  <b>STOP</b>.</br></br>
+			<b>STEP</b> 6: Compute: $\gamma_i = {\nabla f(P_{i+1})^T Qd_i \over d_i^TQd_i}$</br></br>
+			<b>STEP</b> 7: Compute: $d_{i+1} = -\nabla f(P_{i+1})+\gamma_i d_i$</br></br>
+			<b>STEP</b> 8: Set $i = i+1$; go to STEP 3.</br></br>
+			<b>END</b>
+		</div>
+	</div>
+
+	<div>
+		<h3><u>PART (A) [points: 70]</u></h3>
+		<p>
+			Rewrite the <i>CG</i> for minimizing MSE (mean square error) in terms of $\beta$ 
+			(recall lecture_chapter #1, pages: from 8 to 15) where, $Y=X^T\beta$ 
+			and MSE $= {1 \over N} RSS(\beta)={1 \over N}\sum\limits_{i=1}^N\Big(y_i - x_i^T\beta\Big)^2$. Replace, $\nabla f_i, P_i, d_i, and \space Q$ from the CG algorithm with $y_i,x_i,\beta_j,X,Y,\beta$ etc. as needed. Show your derivation(s) (if any).
+			<u>Hints:</u> $P_0$ should be replaced by $\beta(0)$ and study carefully to replace $Q$.
+		</p>
+-->
+
+</div>
+<!--
+		<div>
+			<h3>Solution:</h3>
+			<p>
+				$X$ is the matrix of features</br>
+				$\beta$ is a vector of bias values for each feature</br>
+				$Y$ is the predicted result</br>
+				$x_j$ is a given vector of features</br>
+				$b_j$ is a vector of bias values</br>
+				$y_j$ is a prediction (scalar).</br>
+			</p>
+		</div>
+
+	</div>
+
+	<div>
+		<h4>Chapter 1 - Page 14</h4>
+		<p>
+			For all of the three iterative methods, the value of $j={0,1,2,...,p}$
+			and $i={1,2,...,N}$. Each of the individual values of $\beta$ will be updated
+			simultaneously (at least to be a correct approach theoretically). 
+		</p>
+		<h4>Exact Algorithm/Non-Iterative Algorithm</h4>
+		<p>
+			Continuing from Equation (5), we can write
+			$$\text{RSS}(\beta)=(\textbf{y}-\textbf{X}\beta)^T(\textbf{y}-\textbf{X}\beta) \tag{10}$$
+			where $\textbf{X}$ is an $N \times p$ matrix with each row an input vector, 
+			and $\textbf{y}$ is an N-vector of the outputs in the training set. 
+			Differentiating w.r.t $\beta$ we get the <b><i>normal equations</i></b>
+			$$\textbf{X}^T(\textbf{y}-\textbf{X}\beta)=0 \tag{11}$$
+
+		</p>
+	</div>
+
+	<div>
+		$$  \hat Y = \hat \beta_0 
+			+ X_1 \hat \beta_1 
+			+ X_2 \hat \beta_2 
+			+ X_3 \hat \beta_3
+			+ \dots
+			+ X_P \hat \beta_P
+			\tag{1}
+		$$
+	</div>
+
+	<div>
+		$$  \hat Y = \hat \beta_0 
+			+ \sum\limits_{j=1}^p X_j \hat \beta_j
+			\tag{2}
+		$$
+	</div>
+
+	<div>
+		$$  \hat Y = 
+			\underbrace{X_0 \hat \beta_0}_{X_0=1} 
+			+ X_1 \hat \beta_1 
+			+ X_2 \hat \beta_2 
+			+ X_3 \hat \beta_3
+			+ \dots
+			+ X_P \hat \beta_P
+			\tag{3}
+		$$
+	</div>
+
+	<div>
+		$$  \hat Y = X^T \hat \beta
+			\tag{4}
+		$$
+	</div>
+
+	<div>
+		$$  RSS(\beta)={1 \over N}\sum\limits_{i=1}^N\Big(\text{y}_i - \text{x}_i^T\beta\Big)^2
+			\tag{5}
+		$$
+	</div>
+
+	<div>
+		$$  \text{x}_{t+1} = \text{x}_t - \alpha \text{ }\nabla f(\text{x}_t)
+			\tag{v}
+		$$
+	</div>
+
+	<div>
+		$$  \beta_j(t+1) = \beta_j(t) - \alpha { \partial \over \partial\beta_j} RSS(\beta)
+			\tag{7}
+		$$
+	</div>
+
+	<div>
+		$$  \beta_j(t+1) = \beta_j(t) + {2\alpha \over N} 
+		    \sum\limits_{i=1}^N\Big(\text{y}(i) - \text{x}(i)^T\beta\Big) \cdot \text{x}(i)_j
+			\tag{9}
+		$$
+	</div>
+
+	<div>
+		$$\text{RSS}(\beta)=(\textbf{y}-\textbf{X}\beta)^T(\textbf{y}-\textbf{X}\beta) 
+		\tag{10}$$
+	</div>
+
+	<div>
+		$$\text{RSS}(\beta)=(
+			\underset {1 \times N} {\textbf{y}} - 
+		 	\underset {N \times p} {\textbf{X}\vphantom{\beta}} \text{ }
+			\underset {p \times 1} {\beta)^T} 
+			\text{ }(
+			\underset {1 \times N} {\textbf{y}} - 
+		 	\underset {N \times p} {\textbf{X}\vphantom{\beta}} \text{ }
+			\underset {p \times 1} {\beta)}  
+		\tag{10}$$
+	</div>
+
+	<div>
+		$$\textbf{X}^T(\textbf{y}-\textbf{X}\beta)=0 
+		\tag{11}$$
+	</div>
+
+	<div>
+		$$\beta = (\textbf{X}^T \textbf{X})^{-1} \textbf{X}^T \textbf{y}
+		\tag{12}$$
+	</div>
+
+	<hr>
+
+	<div>
+		<p>
+			$$
+				\hat{\textbf{y}} = \textbf{X}^T \beta
+			$$
+			$$  
+				\hat{\textbf{y}} = 
+				\textbf{X}( \textbf{X}^T \textbf{X} )^{-1} \textbf{X}^T \textbf{y}
+			$$
+			$$   
+				\textbf{X} \textbf{Q} \textbf{X}^T
+			$$
+			$$   
+				\textbf{Q} = (\textbf{X}^T\textbf{X})^{-1}\textbf{X}^T
+			$$
+		</p>
+	</div>
+	<hr>
+-->
+
+
+
+	<script src="scripts/ConjugateGradient.js"></script>
+	
+	<!-- Bootstrap JS -->
+	<script src="./scripts/bootstrap/jquery-3.2.1.min.js"></script>
+    <script src="./scripts/bootstrap/popper.min.js"></script>
+    <script src="./scripts/bootstrap/bootstrap.min.js"></script>
+</body>
+</html>
